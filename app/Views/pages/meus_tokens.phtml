@@ -1,0 +1,90 @@
+<?php // app/views/pages/meus_tokens.phtml ?>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Meus Atendimentos</h1>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-white">
+            <h6 class="m-0 fw-bold text-primary">Histórico Completo</h6>
+        </div>
+        <div class="card-body">
+            
+            <!-- BARRA DE PESQUISA E LIMITE -->
+            <form method="GET" action="<?= URL_BASE ?>/meus-tokens" class="row g-3 mb-4 align-items-end">
+                <div class="col-md-2 col-6">
+                    <label class="form-label small text-muted fw-bold">Mostrar:</label>
+                    <select name="limit" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="10" <?= (isset($limit) && $limit == 10) ? 'selected' : '' ?>>10</option>
+                        <option value="25" <?= (isset($limit) && $limit == 25) ? 'selected' : '' ?>>25</option>
+                        <option value="50" <?= (isset($limit) && $limit == 50) ? 'selected' : '' ?>>50</option>
+                        <option value="100" <?= (isset($limit) && $limit == 100) ? 'selected' : '' ?>>100</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-5 col-12 ms-auto">
+                    <label class="form-label small text-muted fw-bold">Pesquisar Paciente / Token:</label>
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control form-control-sm" 
+                               placeholder="Digite para buscar..." 
+                               value="<?= htmlspecialchars($search ?? '') ?>">
+                        <button class="btn btn-primary btn-sm" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <?php if(!empty($search)): ?>
+                            <a href="<?= URL_BASE ?>/meus-tokens" class="btn btn-secondary btn-sm" title="Limpar busca">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Token</th>
+                            <th>Paciente</th>
+                            <th>Profissional</th>
+                            <th>Data</th>
+                            <th>Valor</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($tokens)): ?>
+                            <?php foreach ($tokens as $token): ?>
+                                <tr>
+                                    <td class="fw-bold text-primary">#<?= htmlspecialchars($token['token']) ?></td>
+                                    <td><?= htmlspecialchars($token['nome_paciente']) ?></td>
+                                    <td><?= htmlspecialchars($token['nome_profissional'] ?? 'N/D') ?></td>
+                                    
+                                    <!-- CORREÇÃO: data-order para ordenação correta -->
+                                    <td data-order="<?= strtotime($token['data_registro']) ?>">
+                                        <?= date('d/m/Y H:i', strtotime($token['data_registro'])) ?>
+                                    </td>
+                                    
+                                    <td class="fw-bold">R$ <?= number_format($token['valor'], 2, ',', '.') ?></td>
+                                    <td class="text-center">
+                                        <a href="<?= URL_BASE ?>/token/imprimir?id=<?= $token['id'] ?>" 
+                                           target="_blank" class="btn btn-info btn-sm text-white" title="Recibo">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="fas fa-folder-open fa-3x mb-3 d-block opacity-25"></i>
+                                    Nenhum histórico encontrado.
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,156 @@
+/* public/css/login-custom.css */
+
+/* 1. Correção Crítica de Altura */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow-x: hidden; /* Evita rolagem horizontal */
+}
+
+/* 2. Sobrescreve o comportamento do layout.php */
+/* O layout original usa d-flex para centralizar cards pequenos. 
+   Aqui desativamos isso para permitir o Split Screen (Tela Dividida) */
+.login-wrapper {
+    display: block !important; /* Remove o display:flex centralizado */
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    padding: 0 !important;
+}
+
+/* 3. Garante que o container da view ocupe tudo */
+.login-screen {
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* 4. Garante que a linha (row) interna também estique */
+.login-screen > .row {
+    height: 100%; /* Isso faz as colunas esticarem até o fim da tela */
+    min-height: 100vh;
+}
+
+/* =========================================
+   LADO ESQUERDO (SIDEBAR VISUAL)
+   ========================================= */
+.login-sidebar {
+    background: linear-gradient(135deg, #ffc107 0%, #dc3545 100%);
+    position: relative;
+    overflow: hidden;
+    height: 100%; /* Ocupa a altura total da linha pai */
+    min-height: 100vh;
+    display: flex; /* Garante alinhamento do conteúdo interno */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Overlay sutil */
+.login-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2); /* Escurece levemente */
+}
+
+/* Conteúdo (Texto e Logo) acima do overlay */
+.login-sidebar .content {
+    z-index: 2;
+    position: relative;
+}
+
+.login-logo-big {
+    width: 120px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    margin-bottom: 1.5rem;
+}
+
+/* Formas decorativas no fundo */
+.shape-1 {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 50vh; /* Tamanho responsivo */
+    height: 50vh;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    z-index: 1;
+}
+.shape-2 {
+    position: absolute;
+    bottom: -5%;
+    left: -10%;
+    width: 40vh;
+    height: 40vh;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* =========================================
+   LADO DIREITO (FORMULÁRIO)
+   ========================================= */
+.bg-white-custom {
+    background-color: #fff;
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Inputs Modernos */
+.form-floating > .form-control {
+    border: 2px solid #e9ecef;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    height: 3.5rem;
+}
+
+.form-floating > .form-control:focus {
+    border-color: #4e73df;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.1);
+}
+
+.form-floating > label {
+    padding-top: 0.6rem; /* Ajuste fino */
+}
+
+/* Botão de Login */
+.btn-login {
+    background: linear-gradient(to right, #4e73df, #224abe);
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 991.98px) {
+    .login-sidebar {
+        display: none !important; /* Esconde lado esquerdo em telas menores/tablets */
+    }
+    
+    .login-screen {
+        background-color: #fff;
+    }
+}

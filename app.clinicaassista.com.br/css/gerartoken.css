@@ -1,0 +1,28 @@
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ajuste de colunas 70/30 apenas em telas grandes (Desktop) */
+@media (min-width: 992px) {
+    .coluna-70 {
+        flex: 0 0 auto;
+        width: 70%;
+    }
+
+    .coluna-30 {
+        flex: 0 0 auto;
+        width: 30%;
+    }
+}
