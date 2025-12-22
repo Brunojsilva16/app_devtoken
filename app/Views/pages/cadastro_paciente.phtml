@@ -1,0 +1,135 @@
+<?php // app/Views/pages/cadastro_paciente.phtml ?>
+<div class="container-fluid">
+    <h2 class="mb-4 text-gray-800">Cadastrar Novo Paciente</h2>
+
+    <?php if (isset($success) && $success): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <?= $success ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($error) && $error): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <?= $error ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-white border-bottom">
+            <h6 class="m-0 fw-bold text-primary"><i class="fas fa-user-injured me-1"></i> Dados Pessoais</h6>
+        </div>
+        <div class="card-body">
+            <form action="<?= URL_BASE ?>/pacientes/salvar" method="POST">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nome" class="form-label fw-bold">Nome Completo *</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light-adm"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="nome" name="nome" required placeholder="Ex: João da Silva">
+                        </div>
+                    </div>
+
+                    <!-- LINHA ALTERADA: CPF e TELEFONE na mesma linha -->
+                    <div class="col-md-3 mb-3">
+                        <label for="cpf" class="form-label fw-bold">CPF</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light-adm"><i class="fas fa-id-card"></i></span>
+                            <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label for="telefone" class="form-label fw-bold">Telefone</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light-adm"><i class="fas fa-phone"></i></span>
+                            <input type="text" class="form-control" id="telefone" name="telefone" placeholder="(99) 99999-9999" maxlength="15">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nome_responsavel" class="form-label">Nome do Responsável <small class="text-muted">(Opcional)</small></label>
+                        <input type="text" class="form-control" id="nome_responsavel" name="nome_responsavel">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="responsavel_financeiro" class="form-label">Responsável Financeiro <small class="text-muted">(Opcional)</small></label>
+                        <input type="text" class="form-control" id="responsavel_financeiro" name="responsavel_financeiro">
+                    </div>
+                </div>
+
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_prof" class="form-label">Profissional de Referência</label>
+                        <select class="form-select" id="id_prof" name="id_prof">
+                            <option value="">Selecione se houver...</option>
+                            <?php foreach ($profissionais as $prof): ?>
+                                <option value="<?= $prof['id'] ?>"><?= htmlspecialchars($prof['nome']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label d-block fw-bold text-muted small text-uppercase mt-1">Origem do Paciente</label>
+                        <div class="p-2 border rounded bg-light-adm d-flex align-items-center">
+                            
+                            <div class="form-check form-check-inline me-4">
+                                <input class="form-check-input" type="radio" name="origem" value="Organico" id="origem_organico">
+                                <label class="form-check-label" for="origem_organico">
+                                    <i class="fas fa-leaf text-success me-1"></i> Orgânico
+                                </label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="origem" value="Marketing" id="origem_marketing">
+                                <label class="form-check-label" for="origem_marketing">
+                                    <i class="fas fa-bullhorn text-info me-1"></i> Marketing
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="<?= URL_BASE ?>/home" class="btn btn-light border">Cancelar</a>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">
+                        <i class="fas fa-save me-1"></i> Salvar Paciente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Máscara de CPF
+    document.getElementById('cpf').addEventListener('input', function (e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,3})(\d{0,2})/);
+        e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + (x[3] ? '.' + x[3] : '') + (x[4] ? '-' + x[4] : '');
+    });
+
+    // Máscara de Telefone (9 Dígitos)
+    document.getElementById('telefone').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, ""); // Remove tudo que não é dígito
+        
+        // Limita a 11 dígitos (DDD + 9 números)
+        if (v.length > 11) v = v.substring(0, 11);
+
+        // Aplica a máscara (XX) XXXXX-XXXX
+        if (v.length > 10) {
+            v = v.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
+        } else if (v.length > 5) {
+            v = v.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, "($1) $2-$3"); // Formato antigo 8 digitos ou digitando
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d\d)(\d{0,5}).*/, "($1) $2");
+        } else {
+            v = v.replace(/^(\d*)/, "($1");
+        }
+        
+        e.target.value = v;
+    });
+</script>

@@ -1,0 +1,139 @@
+<?php // app/views/pages/reports/complete.phtml 
+setlocale(LC_TIME, 'pt_BR', 'pt_BR.utf-8', 'portuguese');
+date_default_timezone_set('America/Sao_Paulo');
+
+$excelParams = $_GET;
+$excelParams['format'] = 'excel';
+$excelUrl = '?' . http_build_query($excelParams);
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Financeiro Completo</title>
+    
+    <style>
+        @page { size: portrait; margin: 10mm; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 11px; margin: 20px; background: #fff; color: #333; }
+        
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
+        .header h1 { margin: 0 0 5px 0; font-size: 18px; text-transform: uppercase; color: #222; }
+        .header p { margin: 2px; font-size: 12px; color: #555; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; text-align: center; font-size: 10px; text-transform: uppercase; color: #444; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        td.center { text-align: center; }
+        td.num { text-align: right; white-space: nowrap; font-family: 'Consolas', monospace; font-weight: bold; }
+        
+ */
+
+        tr.total-row { background-color: #eee !important; border-top: 2px solid #444; font-weight: bold; }
+        tr.total-row td { font-size: 11px; color: #000; }
+        
+        .actions-bar { margin-bottom: 25px; display: flex; justify-content: flex-end; gap: 10px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
+        
+        .btn { padding: 10px 20px; text-decoration: none; color: white; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; }
+        .btn i { margin-right: 8px; }
+        .btn-print { background-color: #4e73df; }
+        .btn-excel { background-color: #1cc88a; }
+        .btn-close { background-color: #858796; }
+
+        @media print {
+            .no-print, .actions-bar { display: none !important; }
+            #wrapper, #accordionSidebar, .sidebar, nav, header, footer, .topbar { display: none !important; }
+            body, html { margin: 0; padding: 0; width: 100%; background: white; }
+            th { background-color: #eee !important; color: #000 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            tr.total-row { background-color: #ddd !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+    
+    <?php if (empty($isExcel)): ?>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <?php endif; ?>
+</head>
+<body>
+
+    <?php if (empty($isExcel)): ?>
+    <div class="actions-bar no-print">
+        <a href="<?= $excelUrl ?>" class="btn btn-excel"><i class="fas fa-file-excel"></i> Exportar Excel</a>
+        <button class="btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+        <button class="btn btn-close" onclick="window.close()"><i class="fas fa-times"></i> Fechar</button>
+    </div>
+    
+    <div class="header">
+        <h1>Relatório de Repasse - Completo</h1>
+        <p>Período: <strong><?= date('d/m/Y', strtotime($periodo['inicio'])) ?></strong> até <strong><?= date('d/m/Y', strtotime($periodo['fim'])) ?></strong></p>
+        <p>Emissão: <?= date('d/m/Y H:i:s') ?></p>
+    </div>
+    <?php endif; ?>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nº</th>
+                <th>Data</th>
+                <th>Token</th>
+                <th>Paciente</th>
+                <th>Resp. Fin.</th>
+                <th>Profissional</th>
+                <th>Modalidade</th>
+                <th>Origem</th>
+                <th>Vencto</th>
+                <th>Pagamento</th>
+                <th>Banco</th>
+                <th>Valor Bruto</th>
+                <th>%</th>
+                <th>Repasse Prof.</th>
+                <th>Repasse Clínica</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $totalBruto = 0; $totalProf = 0; $totalClinica = 0; $contador = 1;
+            if (!empty($dados)):
+                foreach ($dados as $row): 
+                    $valor = (float) $row['valor'];
+                    $porcento = (float) ($row['porcento'] ?? 0);
+                    $repasseProf = $valor * ($porcento / 100);
+                    $repasseClinica = $valor - $repasseProf;
+                    $totalBruto += $valor; $totalProf += $repasseProf; $totalClinica += $repasseClinica;
+            ?>
+                <tr>
+                    <td style="text-align:center; font-weight:bold;"><?= $contador++ ?></td>
+                    <td style="text-align:center"><?= date('d/m/y', strtotime($row['data_registro'])) ?></td>
+                    <td style="text-align:center; mso-number-format:'@';"><?= $row['token'] ?></td>
+                    <td><?= $row['paciente'] ?></td>
+                    <td><?= $row['responsavel_f'] ?? '-' ?></td>
+                    <td><?= $row['nome_profissional'] ?></td>
+                    <td><?= $row['modalidadep'] ?? '-' ?></td>
+                    <td><?= $row['origem'] ?? '-' ?></td>
+                    <td><?= !empty($row['vencimento']) ? date('d/m/y', strtotime($row['vencimento'])) : '-' ?></td>
+                    <td><?= $row['formapag'] ?></td>
+                    <td><?= $row['nome_banco'] ?? '-' ?></td>
+                    <td class="num">R$ <?= number_format($valor, 2, ',', '.') ?></td>
+                    <td style="text-align:center"><?= $porcento ?>%</td>
+                    <td class="num">R$ <?= number_format($repasseProf, 2, ',', '.') ?></td>
+                    <td class="num">R$ <?= number_format($repasseClinica, 2, ',', '.') ?></td>
+                </tr>
+            <?php endforeach; ?>
+
+                <!-- LINHA DE TOTAIS ALINHADA NAS COLUNAS -->
+                <tr class="total-row">
+                    <td colspan="11" style="text-align: right; padding-right: 15px; text-transform: uppercase;">TOTAIS GERAIS:</td>
+                    <td class="num"><?= number_format($totalBruto, 2, ',', '.') ?></td>
+                    <td style="text-align: center;">-</td>
+                    <td class="num" style="color: #d9534f;"><?= number_format($totalProf, 2, ',', '.') ?></td>
+                    <td class="num" style="color: #1cc88a;"><?= number_format($totalClinica, 2, ',', '.') ?></td>
+                </tr>
+
+            <?php else: ?>
+                <tr><td colspan="15" style="text-align:center; padding: 30px;">Nenhum registro encontrado.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+</body>
+</html>

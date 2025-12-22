@@ -1,0 +1,134 @@
+<?php // app/views/pages/reports/filter.phtml ?>
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Relatórios Financeiros</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 fw-bold text-primary">Gerar Relatório</h6>
+        </div>
+        <div class="card-body">
+            <form action="<?= URL_BASE ?>/relatorios/gerar" method="GET" target="_blank">
+                
+                <!-- LINHA 1: Filtros Principais -->
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Data Início</label>
+                        <input type="date" class="form-control" name="data_inicio" 
+                               value="<?= date('Y-m-01') ?>" required>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Data Fim</label>
+                        <input type="date" class="form-control" name="data_fim" 
+                               value="<?= date('Y-m-t') ?>" required>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Profissional</label>
+                        <select class="form-select" name="profissional_id">
+                            <option value="">Todos os Profissionais</option>
+                            <?php foreach ($profissionais as $prof): ?>
+                                <option value="<?= $prof['id'] ?>"><?= htmlspecialchars($prof['nome']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Tipo de Relatório</label>
+                        <select class="form-select" name="tipo">
+                            <option value="completo">Completo (Detalhado)</option>
+                            <option value="reduzido">Reduzido (Resumido)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- BOTÃO TOGGLE PARA BUSCA AVANÇADA -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleFiltrosAvancados()">
+                            <i class="fas fa-filter me-1"></i> <span id="btnTexto">Mostrar Filtros Avançados</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LINHA 2: Filtros Avançados (Ocultos por padrão) -->
+                <div id="filtrosAvancados" class="row bg-light p-3 rounded border mb-3" style="display: none;">
+                    <div class="col-12 mb-2">
+                        <small class="text-uppercase text-muted fw-bold">Refinar Pesquisa</small>
+                    </div>
+
+                    <!-- Responsável Financeiro -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Resp. Financeiro</label>
+                        <input type="text" class="form-control" name="responsavel_f" 
+                               placeholder="Nome para pesquisar...">
+                    </div>
+
+                    <!-- Forma de Pagamento -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Forma de Pagamento</label>
+                        <select class="form-select" name="formapag">
+                            <option value="">Todas</option>
+                            <?php 
+                            $pagamentos = ['Crédito', 'Débito', 'Espécie', 'Pix', 'Pix / Qrcode'];
+                            foreach($pagamentos as $pg): 
+                            ?>
+                                <option value="<?= $pg ?>"><?= $pg ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Nome do Banco -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Nome do Banco</label>
+                        <select class="form-select" name="nome_banco">
+                            <option value="">Todos</option>
+                            <option value="Itau">Banco Itau</option>
+                            <option value="Bradesco">Banco Bradesco</option>
+                        </select>
+                    </div>
+
+                    <!-- Origem -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold small">Origem do Paciente</label>
+                        <select class="form-select" name="origem">
+                            <option value="">Todas</option>
+                            <option value="Organico">Orgânico</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <!-- Botão Imprimir (HTML) -->
+                    <button type="submit" name="format" value="html" class="btn btn-primary btn-lg mr-2">
+                        <i class="fas fa-print me-2"></i> Gerar Relatório
+                    </button>
+                    
+                    <!-- Botão Excel -->
+                    <!-- <button type="submit" name="format" value="excel" class="btn btn-success btn-lg">
+                        <i class="fas fa-file-excel me-2"></i> Exportar Excel
+                    </button> -->
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFiltrosAvancados() {
+    var div = document.getElementById('filtrosAvancados');
+    var btnTexto = document.getElementById('btnTexto');
+    
+    if (div.style.display === 'none') {
+        div.style.display = 'flex';
+        btnTexto.innerText = 'Ocultar Filtros Avançados';
+    } else {
+        div.style.display = 'none';
+        btnTexto.innerText = 'Mostrar Filtros Avançados';
+    }
+}
+</script>

@@ -1,0 +1,192 @@
+<?php // app/views/pages/editar_token.phtml 
+
+// Prevenção de erros de índice indefinido
+// Se a coluna não existir no banco (como 'telefone' se não tiver rodado o ALTER TABLE), define como vazio.
+$origem = $token['origem'] ?? '';
+$telefone = $token['telefone'] ?? '';
+$cpf = $token['cpf'] ?? '';
+$respFin = $token['responsavel_f'] ?? $token['responsavel_financeiro'] ?? '';
+?>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-gray-800">Editar Atendimento</h2>
+        <a href="<?= URL_BASE ?>/home" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    <form action="<?= URL_BASE ?>/token/atualizar" method="POST">
+        <input type="hidden" name="id_token" value="<?= $token['id_token'] ?>">
+        
+        <!-- IMPORTANTE: Campo oculto para manter a Origem, já que os radios estão disabled -->
+        <input type="hidden" name="origem" value="<?= htmlspecialchars($origem) ?>">
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 fw-bold text-primary">Dados do Atendimento #<?= htmlspecialchars($token['token'] ?? '') ?></h6>
+            </div>
+            <div class="card-body">
+                
+                <!-- 1. Identificação -->
+                <h6 class="text-muted mb-3 small text-uppercase fw-bold">1. Identificação</h6>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Paciente</label>
+                        <input type="text" class="form-control" name="nome_paciente" 
+                               value="<?= htmlspecialchars($token['paciente'] ?? '') ?>" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Profissional</label>
+                        <select class="form-select" name="profissional_id" required>
+                            <?php foreach ($profissionais as $prof): ?>
+                                <!-- CORREÇÃO AQUI: Mudado de $prof['id_prof'] para $prof['id'] para compatibilidade com o Model -->
+                                <option value="<?= $prof['id'] ?>" <?= ($prof['id'] == ($token['id_prof'] ?? '')) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($prof['nome']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- CPF: Adicionado 'readonly' -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CPF</label>
+                        <input type="text" class="form-control bg-light" name="cpf_paciente" 
+                               value="<?= htmlspecialchars($cpf) ?>" readonly>
+                        <small class="text-muted" style="font-size: 0.75rem;">(Inabilitado para edição)</small>
+                    </div>
+
+                    <!-- TELEFONE (NOVO): Adicionado como 'readonly' -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" class="form-control bg-light" 
+                               value="<?= htmlspecialchars($telefone) ?>" readonly>
+                         <small class="text-muted" style="font-size: 0.75rem;">(Inabilitado para edição)</small>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Nome Responsável</label>
+                        <input type="text" class="form-control" name="nome_responsavel" 
+                               value="<?= htmlspecialchars($token['nome_resp'] ?? '') ?>">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Resp. Financeiro</label>
+                        <input type="text" class="form-control" name="responsavel_financeiro" 
+                               value="<?= htmlspecialchars($respFin) ?>">
+                    </div>
+                </div>
+
+                <!-- ORIGEM: Visualização apenas -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label d-block text-muted small text-uppercase fw-bold">Origem do Paciente (Inabilitado)</label>
+                        <div class="p-2 border rounded bg-light d-flex align-items-center">
+                            <!-- Radios desabilitados -->
+                            <div class="form-check form-check-inline me-4">
+                                <input class="form-check-input" type="radio" 
+                                       <?= ($origem == 'Organico') ? 'checked' : '' ?> disabled>
+                                <label class="form-check-label text-muted">
+                                    <i class="fas fa-leaf me-1"></i> Orgânico
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" 
+                                       <?= ($origem == 'Marketing') ? 'checked' : '' ?> disabled>
+                                <label class="form-check-label text-muted">
+                                    <i class="fas fa-bullhorn me-1"></i> Marketing
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- 2. Financeiro -->
+                <h6 class="text-muted mb-3 small text-uppercase fw-bold">2. Financeiro</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Modalidade</label>
+                        <select class="form-select" name="modalidade">
+                            <?php 
+                            $modalidades = [
+                                'Avaliação T' => 'Avaliação Terapia (Psicologia / Terapia Casal / TO)',
+                                'Avaliação F' => 'Avaliação Fono',
+                                'Avaliação N' => 'Avaliação Neuropsicológica',
+                                'Visita E' => 'Visita Escolar',
+                                'Proase' => 'Proase',
+                                'Plano Mensal' => 'Plano Mensal',
+                                'Consulta Psiquiatra' => 'Consulta Psiquiatra',
+                                'Consulta Nutrição' => 'Consulta Nutrição'
+                            ];
+                            $atualModalidade = $token['modalidadep'] ?? '';
+                            foreach($modalidades as $val => $label): 
+                            ?>
+                                <option value="<?= $val ?>" <?= ($atualModalidade == $val) ? 'selected' : '' ?>>
+                                    <?= $label ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nome do Banco</label>
+                        <select name="nome_banco" class="form-select">
+                            <?php $atualBanco = $token['nome_banco'] ?? ''; ?>
+                            <option value="Itau" <?= ($atualBanco == 'Itau') ? 'selected' : '' ?>>Banco Itau</option>
+                            <option value="Bradesco" <?= ($atualBanco == 'Bradesco') ? 'selected' : '' ?>>Banco Bradesco</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Pagamento</label>
+                        <select class="form-select" name="formapag">
+                            <?php 
+                            $pagamentos = ['Crédito', 'Débito', 'Espécie', 'Pix', 'Pix / Qrcode'];
+                            $atualPag = $token['formapag'] ?? '';
+                            foreach($pagamentos as $pg): 
+                            ?>
+                                <option value="<?= $pg ?>" <?= ($atualPag == $pg) ? 'selected' : '' ?>><?= $pg ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row align-items-end bg-light p-2 rounded">
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label fw-bold text-success">Valor (R$)</label>
+                        <input type="text" class="form-control fw-bold border-success" name="valor" id="valor" 
+                               value="<?= number_format($token['valor'] ?? 0, 2, ',', '.') ?>" required>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label fw-bold">Vencimento</label>
+                        <input type="date" class="form-control" name="vencimento" 
+                               value="<?= $token['vencimento'] ?? '' ?>">
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer text-end">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-1"></i> Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Máscara monetária simples para edição
+    const valorInput = document.getElementById('valor');
+    if(valorInput) {
+        valorInput.addEventListener('input', e => {
+            let v = e.target.value.replace(/\D/g, '');
+            v = (v / 100).toFixed(2) + '';
+            v = v.replace(".", ",").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+            e.target.value = v;
+        });
+    }
+</script>

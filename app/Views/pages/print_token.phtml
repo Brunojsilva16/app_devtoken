@@ -1,0 +1,207 @@
+<?php // app/Views/pages/print_token.phtml 
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Imprimir Token</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            /* Fonte monoespaçada tipo cupom */
+            width: 300px;
+            /* Largura típica de impressora térmica */
+            margin: 0 auto;
+            padding: 10px;
+            text-align: left;
+            /* Alinhamento geral à esquerda */
+            color: #000;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            margin: 2px 0;
+            font-size: 0.9rem;
+        }
+
+        .atendente-info {
+            text-align: left;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            border-bottom: 1px dashed #000;
+            margin: 10px 0;
+        }
+
+        .details {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .details strong {
+            display: inline-block;
+            min-width: 80px;
+            /* Alinha os labels */
+        }
+
+        .token-box {
+            text-align: center;
+            border: 2px solid #000;
+            padding: 8px;
+            margin: 15px 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .lista-sessoes {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .lista-sessoes li {
+            margin-bottom: 2px;
+        }
+
+        .valor-total {
+            text-align: right;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .footer {
+            font-size: 11px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        /* Botões */
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            background: #eee;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <br>
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <h3>CLÍNICA ASSISTA</h3>
+        <p>Controle de pagamento</p>
+    </div>
+
+    <!-- NOME DO USUÁRIO GERADOR -->
+
+    <br>
+    <div class="atendente-info">
+        Gerado por: <?= htmlspecialchars($token['nome_usuario'] ?? 'Sistema') ?>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DETALHES GERAIS -->
+    <div class="details">
+        <div><strong>Paciente:</strong> <?= htmlspecialchars($token['paciente'] ?? '') ?></div>
+
+        <?php if (!empty($token['nome_resp'])): ?>
+            <div><strong>Resp.:</strong> <?= htmlspecialchars($token['nome_resp']) ?? '' ?></div>
+        <?php endif; ?>
+
+        <?php if (!empty($token['responsavel_f'])): ?>
+            <div><strong>Resp. Fin.:</strong> <?= htmlspecialchars($token['responsavel_f']) ?? '' ?></div>
+        <?php endif; ?>
+
+        <div><strong>Profissional:</strong> <?= htmlspecialchars($token['nome_profissional'] ?? 'Geral') ?></div>
+        <div><strong>Modalidade:</strong> <?= htmlspecialchars($token['modalidadep'] ?? '-') ?></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FINANCEIRO -->
+    <div class="details">
+
+        <?php if (!empty($token['formapag'])): ?>
+            <div><strong>Pagamento:</strong> <?= htmlspecialchars($token['formapag']) ?? '' ?></div>
+        <?php endif; ?>
+
+        <div class="valor-total">
+            Valor: R$ <?= number_format($token['valor'], 2, ',', '.') ?>
+        </div>
+    </div>
+
+    <!-- SESSÕES (Se houver) -->
+    <?php if (!empty($sessoes)): ?>
+        <div class="divider"></div>
+        <div class="section-title">Datas das Sessões</div>
+        <ul class="lista-sessoes">
+            <?php foreach ($sessoes as $i => $data): ?>
+                <li><?= ($i + 1) ?>ª Sessão: <?= date('d/m/Y', strtotime($data)) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+
+    <div class="divider"></div>
+
+    <!-- TOKEN -->
+    <div style="text-align: center; margin-bottom: 5px;">TOKEN:</div>
+    <div class="token-box">
+        <?= $token['token'] ?>
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="footer">
+        Data Emissão: <?= date('d/m/Y H:i:s') ?>
+    </div>
+
+    <br>
+
+    <!-- BOTÕES (Não impressos) -->
+    <!-- <button class="no-print btn-action" onclick="window.print()">Imprimir Novamente</button> -->
+    <button class="no-print btn-action" onclick="window.close()">Fechar</button>
+
+</body>
+
+</html>
